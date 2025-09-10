@@ -1,0 +1,30 @@
+{
+    "name": "dashattit/server_test",
+    "description": "Simple mvc framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "dashattit",
+            "email": "dashyla.2021@mail.ru"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.4 | ^8.0",
+        "illuminate/database": "10.x-dev",
+        "illuminate/events": "10.x-dev",
+        "nikic/fast-route": "2.0.x-dev",
+        "dashattit/server_validators": "dev-main"
+
+    },
+    "autoload": {
+        "psr-4": {
+            "Src\\": "core/Src/",
+            "": "app/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.4@dev"
+    }
+}
