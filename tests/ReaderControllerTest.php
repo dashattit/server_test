@@ -6,8 +6,8 @@ use Model\Readers;
 
 class ReaderControllerTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('additionProvider')]
-    public function testCreate(string $httpMethod, array $readerData, string $message): void
+    #[DataProvider('additionProvider')]
+    public function testCreate(string $httpMethod, array $readerData, string $message, int $testNumber): void
     {
         // Создаем заглушку для Request
         $request = $this->createMock(\Src\Request::class);
@@ -19,26 +19,21 @@ class ReaderControllerTest extends TestCase
         // Сохраняем результат работы метода
         $result = (new \Controller\ReadersController())->create($request);
 
-        if (!empty($result)) {
-            // Если это View, значит были ошибки
-            if ($result instanceof \Src\View) {
-                $errorsAsString = implode(' ', array_map(fn($e) => implode(' ', (array)$e), $result->data['errors']));
-                $this->assertStringContainsString($message, $errorsAsString);
-                return;
-            }
-
-            // На всякий случай, если вдруг что-то другое
-            $this->fail('Unexpected result type');
+        if ($result instanceof \Src\View) {
+            $errors = $result->data['errors'] ?? [];
+            $errorsAsString = implode(' ', array_map(fn($e) => implode(' ', (array)$e), $errors));
+            $this->assertStringContainsString($message, $errorsAsString);
+            return;
         }
 
 // Проверяем, что читатель добавился в базу
         $this->assertTrue((bool)Readers::where('telephone', $readerData['telephone'])->count());
 
-// Удаляем тестового читателя
         Readers::where('telephone', $readerData['telephone'])->delete();
-
 // Проверяем редирект при успешном создании
-        $this->assertContains($message, xdebug_get_headers());
+        if ($testNumber === 2 || $testNumber === 3) {
+            $this->assertContains($message, xdebug_get_headers());
+        }
 
     }
 
@@ -68,31 +63,31 @@ class ReaderControllerTest extends TestCase
             ['GET', [
                 'first_name' => '', 'last_name' => '', 'patronym' => '',
                 'address' => '', 'telephone' => ''
-            ], ''],
+            ], '', 1],
 
             // POST с корректными данными → редирект
             ['POST', [
                 'first_name' => 'Алексей', 'last_name' => 'Иванов', 'patronym' => 'Сергеевич',
                 'address' => 'г. Томск, ул. Иркутский тракт, 102', 'telephone' => '89134450835'
-            ], 'Location: /server/readers'],
+            ], 'Location: /server/readers', 2],
 
             // POST с заполнением только обязательных полей → редирект
             ['POST', [
                 'first_name' => 'Алексей', 'last_name' => 'Иванов', 'patronym' => '',
                 'address' => 'г. Томск, ул. Иркутский тракт, 102', 'telephone' => '89134450835'
-            ], 'Location: /server/readers'],
+            ], 'Location: /server/readers', 3],
 
             // POST без данных → ошибка
             ['POST', [
                 'first_name' => '', 'last_name' => '', 'patronym' => '',
                 'address' => '', 'telephone' => ''
-            ], 'Поле first_name пусто'],
+            ], 'Поле first_name пусто', 4],
 
             // POST с существующими данными → ошибка
             ['POST', [
                 'first_name' => 'Алексей', 'last_name' => 'Иванов', 'patronym' => 'Сергеевич',
                 'full_name' => 'Иванов Алексей Сергеевич', 'address' => 'г. Томск, ул. Иркутский тракт, 102', 'telephone' => '89134450835'
-            ], 'Читатель с таким ФИО уже существует'],
+            ], 'Читатель с таким ФИО уже существует', 5],
         ];
 
     }

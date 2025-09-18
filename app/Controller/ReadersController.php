@@ -62,10 +62,7 @@ class ReadersController
             }
         }
 
-        return new View('site.create_reader', [
-            'errors' => $errors,
-            'old' => $request->all() ?? []
-        ]);
+        return new View('site.create_reader');
     }
 
     public function delete(Request $request): void
