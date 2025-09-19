@@ -39,12 +39,12 @@ class ReaderControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        $_SERVER['DOCUMENT_ROOT'] = '../server';
+        $_SERVER['DOCUMENT_ROOT'] = '';
 
         $GLOBALS['app'] = new Src\Application(new Src\Settings([
-            'app' => include $_SERVER['DOCUMENT_ROOT'] . '/config/app.php',
-            'db' => include $_SERVER['DOCUMENT_ROOT'] . '/config/db.php',
-            'path' => include $_SERVER['DOCUMENT_ROOT'] . '/config/path.php',
+            'app' => include $_SERVER['DOCUMENT_ROOT'] . './config/app.php',
+            'db' => include $_SERVER['DOCUMENT_ROOT'] . './config/db.php',
+            'path' => include $_SERVER['DOCUMENT_ROOT'] . './config/path.php',
         ]));
 
         if (!function_exists('app')) {
@@ -69,13 +69,13 @@ class ReaderControllerTest extends TestCase
             ['POST', [
                 'first_name' => 'Алексей', 'last_name' => 'Иванов', 'patronym' => 'Сергеевич',
                 'address' => 'г. Томск, ул. Иркутский тракт, 102', 'telephone' => '89134450835'
-            ], 'Location: /server/readers', 2],
+            ], 'Location: /server_test/readers', 2],
 
             // POST с заполнением только обязательных полей → редирект
             ['POST', [
                 'first_name' => 'Алексей', 'last_name' => 'Иванов', 'patronym' => '',
                 'address' => 'г. Томск, ул. Иркутский тракт, 102', 'telephone' => '89134450835'
-            ], 'Location: /server/readers', 3],
+            ], 'Location: /server_test/readers', 3],
 
             // POST без данных → ошибка
             ['POST', [

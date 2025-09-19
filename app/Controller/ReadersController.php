@@ -58,7 +58,7 @@ class ReadersController
 
             if (Readers::create($request->all())) {
                 app()->route->redirect('/readers');
-                return ''; // Добавляем return после редиректа
+                return '';
             }
         }
 
